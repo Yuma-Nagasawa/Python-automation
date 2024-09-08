@@ -1,0 +1,60 @@
+# Import necessary libraries
+import pandas as pd
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
+import tkinter as tk
+from tkinter import filedialog
+
+# Step 1: Create a function to load the Excel file using Tkinter
+def select_file():
+    # Open a file dialog to select the Excel file
+    root = tk.Tk()
+    root.withdraw()  # Hide the root window
+    file_path = filedialog.askopenfilename(title="Select Excel File", 
+                                           filetypes=[("Excel files", "*.xlsx *.xls")])
+    return file_path
+
+# Main function to generate the word cloud
+def generate_wordcloud():
+    # Let user select the file path using Tkinter
+    file_path = select_file()
+
+    if not file_path:
+        print("No file selected. Exiting.")
+        return
+
+    # Step 2: Load the selected Excel file
+    # Adjust the sheet name and column names according to your Excel file structure
+    try:
+        df = pd.read_excel(file_path, sheet_name='ChatGPT Plugins + 25 Powerful A')  # Adjust the sheet name if necessary
+    except Exception as e:
+        print(f"Error loading Excel file: {e}")
+        return
+
+    # Step 3: Preprocess the comments
+    # Assuming the comments are in a column named 'Comments' - change this if necessary
+    if 'Comments' not in df.columns:
+        print("The 'Comments' column was not found in the Excel file.")
+        return
+
+    comments = df['Comments'].dropna()
+
+    # Combine all comments into one large string
+    text = " ".join(comment for comment in comments)
+
+    # Step 4: Generate the word cloud
+    # You can customize stopwords and other parameters
+    wordcloud = WordCloud(width=800, height=400, background_color='white').generate(text)
+
+    # Step 5: Display the word cloud and save it to a PNG file
+    plt.figure(figsize=(10, 5))
+    plt.imshow(wordcloud, interpolation='bilinear')
+    plt.axis('off')
+    plt.savefig('wordcloud.png')  # Save the word cloud as a PNG file
+    plt.show()
+
+    print("Word cloud saved as 'wordcloud.png'")
+
+# Run the function
+if __name__ == "__main__":
+    generate_wordcloud()
